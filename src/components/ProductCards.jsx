@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
 export default function ProductCards() {
   const cards = [
@@ -56,11 +56,13 @@ export default function ProductCards() {
               key={card.id}
               className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
-              <img
-                className="h-52 w-full object-cover"
-                src={card.image}
-                alt={card.name}
-              />
+              <Link to={`/product/${card.id}`}>
+                <img
+                  className="h-52 w-full object-cover"
+                  src={card.image}
+                  alt={card.name}
+                />
+              </Link>
 
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
@@ -78,7 +80,7 @@ export default function ProductCards() {
 
                 <div className="mt-5 flex items-center justify-between">
                   <p className="text-xl font-bold text-gray-900">
-                    ₹{card.amount}
+                    Rs. {card.amount}
                   </p>
                   <button className="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-700">
                     Add to Cart

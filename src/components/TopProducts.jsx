@@ -1,5 +1,4 @@
-import React from "react";
-import ProductCards from "./ProductCards";
+import ProductCards from "./ProductCards.jsx";
 export default function TopProducts() {
   return (
     <div>
