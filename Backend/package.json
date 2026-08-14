@@ -5,15 +5,16 @@
   "main": "Server.js",
   "scripts": {
     "start": "node --env-file-if-exists=.env Server.js",
-    "check": "node --check Server.js && node --check Config/db.js && node --check Routes/userRoutes.js && node --check Controllers/userController.js && node --check Models/userModels.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "node --check Server.js && node --check Config/db.js && node --check Models/userModel.js && node --check Routes/userRoutes.js && node --check Controllers/userController.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch --env-file-if-exists=.env Server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mysql2": "^3.22.5",
-    "sequelize": "^6.37.8"
+    "mongoose": "^9.9.2"
   }
 }

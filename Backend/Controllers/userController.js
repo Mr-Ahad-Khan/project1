@@ -1,109 +1,84 @@
-const User = require("../Models/userModels");
+const User = require("../Models/userModel");
 
-// Get All Users
-const AllUsers = async (req, res) => {
+const handleDatabaseError = (res, error, fallbackMessage) => {
+  console.error(fallbackMessage, error);
+
+  if (error.code === 11000) {
+    return res.status(409).json({ message: "A user with that name, email, or phone already exists" });
+  }
+
+  if (error.name === "ValidationError") {
+    return res.status(400).json({ message: error.message });
+  }
+
+  if (error.name === "CastError") {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+
+  return res.status(500).json({ message: "Internal Server Error" });
+};
+
+const AllUsers = async (_req, res) => {
   try {
-    const users = await User.findAll();
-    res.status(200).json(users);
+    const users = await User.find().sort({ createdAt: 1 });
+    return res.status(200).json(users);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return handleDatabaseError(res, error, "Error fetching users:");
   }
 };
 
-// Get User By ID
 const getUserById = async (req, res) => {
-  const { id } = req.params;
-
   try {
-    const user = await User.findByPk(id);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return handleDatabaseError(res, error, "Error fetching user:");
   }
 };
 
-// Create User
 const createUser = async (req, res) => {
-  const { name, email, phone } = req.body;
-
   try {
-    const newUser = await User.create({
-      name,
-      email,
-      phone,
-    });
-
-    res.status(201).json({
-      message: "User created successfully",
-      data: newUser,
-    });
+    const newUser = await User.create(req.body);
+    return res.status(201).json({ message: "User created successfully", data: newUser });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return handleDatabaseError(res, error, "Error creating user:");
   }
 };
 
-// Update User
 const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name, email, phone } = req.body;
-
   try {
-    const user = await User.findByPk(id);
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!user) {
+    if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    await user.update({
-      name,
-      email,
-      phone,
-    });
-
-    res.status(200).json({
-      message: "User updated successfully",
-      data: user,
-    });
+    return res.status(200).json({ message: "User updated successfully", data: updatedUser });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return handleDatabaseError(res, error, "Error updating user:");
   }
 };
 
-// Delete User
 const deleteUser = async (req, res) => {
-  const { id } = req.params;
-
   try {
-    const user = await User.findByPk(id);
+    const user = await User.findByIdAndDelete(req.params.id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    await user.destroy();
-
-    res.status(200).json({
-      message: "User deleted successfully",
-    });
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return handleDatabaseError(res, error, "Error deleting user:");
   }
 };
 
-module.exports = {
-  AllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-};
+module.exports = { AllUsers, getUserById, createUser, updateUser, deleteUser };

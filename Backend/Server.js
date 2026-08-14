@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const userRoutes = require("./Routes/userRoutes");
-const sequelize = require("./Config/db");
+const connectDatabase = require("./Config/db");
 
 app.use(cors());
 app.use(express.json());
@@ -17,15 +17,14 @@ const PORT = Number(process.env.PORT) || 5000;
 
 const startServer = async () => {
   try {
-    await sequelize.authenticate();
-    await sequelize.sync();
-    console.log("Database synced successfully.");
+    await connectDatabase();
+    console.log("Connected to MongoDB Atlas successfully.");
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Unable to start server:", error);
+    console.error("Unable to start server:", error.message);
     process.exit(1);
   }
 };
